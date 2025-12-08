@@ -6,4 +6,4 @@ idna==3.11
 pyyaml
 gspread
 google-auth
-urllib3==2.5.0
+urllib3==2.6.1
