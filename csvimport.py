@@ -298,6 +298,14 @@ def main():
             writer = csv.DictWriter(temp_in, fieldnames=input_format)
             writer.writeheader()
             for row in all_rows:
+                extra_fields = set(row.keys()) - set(input_format)
+                if extra_fields:
+                    print(
+                        f"Error: CSV contains fields not in input_format: {', '.join(sorted(extra_fields))}\n"
+                        f"Check the 'input_format' list for org '{args.org}' in your config file ({args.config}).",
+                        file=sys.stderr
+                    )
+                    sys.exit(2)
                 writer.writerow(row)
             temp_in_path = temp_in.name
         deduped_rows = transform_csv(temp_in_path, args.output, input_format, output_format, existing_entries, key_columns, logger)
@@ -340,6 +348,14 @@ def main():
             writer = csv.DictWriter(outfile, fieldnames=output_format)
             writer.writeheader()
             for row in deduped_rows:
+                extra_fields = set(row.keys()) - set(output_format)
+                if extra_fields:
+                    print(
+                        f"Error: Row contains fields not in output_format: {', '.join(sorted(extra_fields))}\n"
+                        f"Check the 'output_format' list for org '{args.org}' in your config file ({args.config}).",
+                        file=sys.stderr
+                    )
+                    sys.exit(2)
                 writer.writerow(row)
         logger.info(f"Deduplicated data written to {args.output}.")
         print(f"Deduplicated data written to {args.output}.")

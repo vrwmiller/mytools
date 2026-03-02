@@ -70,3 +70,35 @@ organizations:
     assert "B,2" in out_text
     assert "C,3" in out_text
     assert "D,4" in out_text
+
+def test_field_mismatch_exits_with_friendly_error(tmp_path):
+    import subprocess, os, sys
+    # CSV has an extra field not in input_format
+    file1 = tmp_path / "input_extra.csv"
+    file1.write_text("col1,col2,extra_field\nA,1,unexpected\n")
+    output = tmp_path / "output.csv"
+    logs_dir = tmp_path / "logs"
+    logs_dir.mkdir(exist_ok=True)
+    config_file = tmp_path / "test_config.conf"
+    config_file.write_text("""
+organizations:
+  testorg:
+    input_format: [col1, col2]
+    output_format: [col1, col2]
+    key_fields: [col1, col2]
+    sheet_name: test_sheet
+""")
+    csvimport_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "csvimport.py"))
+    cmd = [
+        sys.executable, csvimport_path,
+        "--input-files", str(file1),
+        "--output", str(output),
+        "--log-file", str(logs_dir / "csvimport.log"),
+        "--config", str(config_file),
+        "--org", "testorg"
+    ]
+    result = subprocess.run(cmd, cwd=tmp_path, capture_output=True)
+    assert result.returncode == 2
+    stderr = result.stderr.decode()
+    assert "extra_field" in stderr
+    assert "input_format" in stderr or "output_format" in stderr
