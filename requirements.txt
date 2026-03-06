@@ -1,6 +1,6 @@
 pytest
 requests==2.32.5
-certifi==2026.1.4
+certifi==2026.2.25
 charset_normalizer==3.4.4
 idna==3.11
 pyyaml
