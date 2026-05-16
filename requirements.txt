@@ -2,7 +2,7 @@ pytest
 requests==2.33.1
 certifi==2026.4.22
 charset_normalizer==3.4.7
-idna==3.11
+idna==3.15
 pyyaml
 gspread
 google-auth
